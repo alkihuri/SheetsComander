@@ -1,0 +1,1 @@
+Unity Google Sheets Toolkit — a reusable Unity package for integrating Unity projects with Google Sheets via Google Apps Script. Provides a simple API for managing sheets, records, users, and data synchronization.
