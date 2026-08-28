@@ -13,6 +13,74 @@ const Router = {
       switch (action) {
 
 
+        case 'createGroup':
+
+          data =
+            GroupService.createGroup(
+              payload
+            );
+
+          break;
+
+
+        case 'ensureGroup':
+
+          data =
+            GroupService.ensureGroup(
+              payload
+            );
+
+          break;
+
+
+        case 'findGroup':
+
+          data =
+            GroupService.findGroup(
+              payload
+            );
+
+          break;
+
+
+        case 'getGroup':
+
+          data =
+            GroupService.getGroup(
+              payload
+            );
+
+          break;
+
+
+        case 'listGroups':
+
+          data =
+            GroupService.listGroups();
+
+          break;
+
+
+        case 'updateGroup':
+
+          data =
+            GroupService.updateGroup(
+              payload
+            );
+
+          break;
+
+
+        case 'deleteGroup':
+
+          data =
+            GroupService.deleteGroup(
+              payload
+            );
+
+          break;
+
+
         case 'createUser':
 
           data =

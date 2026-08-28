@@ -9,6 +9,11 @@ const CONFIG = {
 };
 
 
+const GROUP_CONFIG = {
+  LEVEL_COUNT: 7
+};
+
+
 function getConfig() {
 
   const properties =
