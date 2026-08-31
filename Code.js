@@ -1,3 +1,15 @@
+function doOptions() {
+  return ContentService.createTextOutput("")
+    .setMimeType(ContentService.MimeType.TEXT)
+    .setHeader("Access-Control-Allow-Origin", "*")
+    .setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+    .setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
+
+
+
+
 function doGet(e) {
   return Response.success({
     service: 'GoogleSheetsAPI',
@@ -15,7 +27,7 @@ function debugProperties() {
 
 function doPost(e) {
   const requestId = Utils.generateId();
-
+ if (e.method === "OPTIONS") return doOptions();
   try {
     if (!e || !e.postData || !e.postData.contents) {
       return Response.error(
