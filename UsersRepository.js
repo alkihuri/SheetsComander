@@ -9,7 +9,8 @@ const UsersRepository = {
     'GroupId',
     'CreatedAt',
     'UpdatedAt',
-    'Status'
+    'Status',
+    'LevelResults'
   ],
 
 
@@ -128,7 +129,8 @@ const UsersRepository = {
       GroupId: row[3],
       CreatedAt: Utils.normalizeValue(row[4]),
       UpdatedAt: Utils.normalizeValue(row[5]),
-      Status: row[6]
+      Status: row[6],
+      LevelResult : row[7]
     };
   },
 
@@ -142,7 +144,8 @@ const UsersRepository = {
       user.GroupId || '',
       user.CreatedAt || '',
       user.UpdatedAt || '',
-      user.Status || 'active'
+      user.Status || 'active',
+      user.LevelResults || 'none'
     ];
   },
 

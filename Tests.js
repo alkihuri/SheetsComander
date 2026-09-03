@@ -1744,7 +1744,7 @@ function testDoGetAppendRow() {
 
   const mockEvent = {
     parameter: {
-      action: "appendRow",
+      action: "cre",
 
       requestId: "003464ff-c2f6-455a-9995-ec89dc898ff7",
 
