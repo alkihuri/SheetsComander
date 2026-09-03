@@ -7,67 +7,94 @@ function doOptions() {
 }
 
 
-
-
+ 
 
 function doGet(e) {
-const requestId = Utils.generateId();
+  const generatedRequestId = Utils.generateId();
 
-try {
-const params = e && e.parameter ? e.parameter : {};
- console.log(params);
-if (!params.action) {
-  console.log("Get req without action");
-  return Response.success({
-    service: 'GoogleSheetsAPI',
-    version: CONFIG.VERSION,
-    status: 'online'
-  });
-}
+  try {
+    const params = e && e.parameter ? e.parameter : {};
 
-// Создаём тот же request, который раньше приходил через POST
-const request = {
-  action: params.action,
-  requestId: params.requestId || requestId,
-  apiKey: params.apiKey,
+    console.log("GET PARAMS:", JSON.stringify(params));
 
-  // Все параметры кроме служебных автоматически кладём в payload
-  payload: {}
-};
+    if (!params.action) {
+      console.log("GET request without action");
 
-const reservedParams = [
-  'action',
-  'requestId',
-  'apiKey'
-];
+      return Response.success({
+        service: 'GoogleSheetsAPI',
+        version: CONFIG.VERSION,
+        status: 'online'
+      });
+    }
 
-Object.keys(params).forEach(key => {
-  if (!reservedParams.includes(key)) {
-    request.payload[key] = params[key];
+    const request = {
+      action: params.action,
+      requestId: params.requestId || generatedRequestId,
+      apiKey: params.apiKey,
+      payload: {}
+    };
+
+    const reservedParams = [
+      "action",
+      "requestId",
+      "apiKey"
+    ];
+
+    Object.keys(params).forEach(key => {
+
+      // Не кладём служебные параметры в payload
+      if (reservedParams.includes(key)) {
+        return;
+      }
+
+      let value = params[key];
+
+      // GET всегда передаёт параметры как строки.
+      // Если Unity передал JSON-массив или объект —
+      // восстанавливаем исходный тип.
+      if (
+        typeof value === "string" &&
+        (
+          value.startsWith("[") ||
+          value.startsWith("{")
+        )
+      ) {
+        try {
+          value = JSON.parse(value);
+        } catch (parseError) {
+          console.log(
+            `Could not parse "${key}" as JSON: ${parseError}`
+          );
+        }
+      }
+
+      request.payload[key] = value;
+    });
+
+    console.log("REQUEST ID:", request.requestId);
+    console.log("REQUEST:", JSON.stringify(request));
+
+    Validation.validateRequest(request);
+    Validation.validateApiKey(request);
+
+    return Router.handle(request);
+
+  } catch (error) {
+
+    console.error(error);
+
+    return Response.error(
+      error.code || "INTERNAL_ERROR",
+      error.message || String(error),
+      generatedRequestId
+    );
   }
-});
-
-//Validation.validateRequest(request);
-//Validation.validateApiKey(request);
-
-
-  console.log("REQUEST ID:", request.requestId);
- console.log("REQUEST:", JSON.stringify(request));
-
-return Router.handle(request);
-
-} catch (error) {
-
-console.error(error);
-
-return Response.error(
-  error.code || 'INTERNAL_ERROR',
-  error.message || String(error),
-  requestId
-);
-
 }
-}
+
+
+
+
+
 function debugProperties() {
   const properties = PropertiesService.getScriptProperties();
   const all = properties.getProperties();

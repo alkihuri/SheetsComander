@@ -1727,13 +1727,46 @@ function testDoGet1() {
 function testDoGet2() {
   const mockEvent = {
     parameter: {
-      action: "ensureGroup", 
-      groupName: "123",
+      action: "getSheet", 
+      sheet : "2",
+      requestId: "123",
       apiKey: "123" 
     }
   };
 
   const response = doGet(mockEvent);
 
+  console.log(response.getContent());
+}
+
+
+function testDoGetAppendRow() {
+
+  const mockEvent = {
+    parameter: {
+      action: "appendRow",
+
+      requestId: "003464ff-c2f6-455a-9995-ec89dc898ff7",
+
+      apiKey: "123",
+
+      sheet: "7",
+
+      values: JSON.stringify([
+        "2",
+        "14.3",
+        "14.3",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ])
+    }
+  };
+
+  const response = doGet(mockEvent);
+
+  console.log("RESPONSE:");
   console.log(response.getContent());
 }
