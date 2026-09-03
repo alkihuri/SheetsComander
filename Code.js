@@ -11,6 +11,13 @@ function doOptions() {
 
 
 function doGet(e) {
+const requestId = Utils.generateId();
+
+try {
+const params = e && e.parameter ? e.parameter : {};
+ console.log(params);
+if (!params.action) {
+  console.log("Get req without action");
   return Response.success({
     service: 'GoogleSheetsAPI',
     version: CONFIG.VERSION,
@@ -18,6 +25,49 @@ function doGet(e) {
   });
 }
 
+// Создаём тот же request, который раньше приходил через POST
+const request = {
+  action: params.action,
+  requestId: params.requestId || requestId,
+  apiKey: params.apiKey,
+
+  // Все параметры кроме служебных автоматически кладём в payload
+  payload: {}
+};
+
+const reservedParams = [
+  'action',
+  'requestId',
+  'apiKey'
+];
+
+Object.keys(params).forEach(key => {
+  if (!reservedParams.includes(key)) {
+    request.payload[key] = params[key];
+  }
+});
+
+//Validation.validateRequest(request);
+//Validation.validateApiKey(request);
+
+
+  console.log("REQUEST ID:", request.requestId);
+ console.log("REQUEST:", JSON.stringify(request));
+
+return Router.handle(request);
+
+} catch (error) {
+
+console.error(error);
+
+return Response.error(
+  error.code || 'INTERNAL_ERROR',
+  error.message || String(error),
+  requestId
+);
+
+}
+}
 function debugProperties() {
   const properties = PropertiesService.getScriptProperties();
   const all = properties.getProperties();
@@ -27,7 +77,11 @@ function debugProperties() {
 
 function doPost(e) {
   const requestId = Utils.generateId();
- if (e.method === "OPTIONS") return doOptions();
+ 
+ if (e.method === "OPTIONS") 
+ {
+  return doOptions(); 
+ }
   try {
     if (!e || !e.postData || !e.postData.contents) {
       return Response.error(
@@ -46,6 +100,8 @@ function doPost(e) {
     }
 
     const request = JSON.parse(e.postData.contents);
+
+    console.log(request);
 
     request.requestId = request.requestId || requestId;
 

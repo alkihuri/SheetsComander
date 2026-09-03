@@ -1705,3 +1705,35 @@ function debugTestConfiguration() {
     '===================================='
   );
 }
+
+
+function testDoGet1() {
+  const mockEvent = {
+    parameter: {
+      action: "createUser",
+      fullName: "Test User",
+      groupId: "Test Group",
+      apiKey: "123",
+      requestId: "test-request-123",
+      pilgrimNumber : "123"
+    }
+  };
+
+  const response = doGet(mockEvent);
+
+  console.log(response.getContent());
+}
+
+function testDoGet2() {
+  const mockEvent = {
+    parameter: {
+      action: "ensureGroup", 
+      groupName: "123",
+      apiKey: "123" 
+    }
+  };
+
+  const response = doGet(mockEvent);
+
+  console.log(response.getContent());
+}

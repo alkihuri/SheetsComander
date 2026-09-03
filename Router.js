@@ -1,7 +1,7 @@
 const Router = {
 
   handle: function(request) {
-
+ 
     const action = request.action;
     const payload = request.payload || {};
     const requestId = request.requestId;
