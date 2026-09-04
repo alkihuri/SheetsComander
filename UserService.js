@@ -41,10 +41,17 @@ const UsersService = {
 
     if (existing) {
 
-      throw Utils.error(
-        'USER_ALREADY_EXISTS',
-        'User with this pilgrim number already exists'
-      );
+       // Если пользователь существует - обновляем его
+    // Добавляем userId из найденной записи
+        payload.userId = existing.user.UserId;
+    
+    // Если LevelResults передан, обновляем его
+          if (payload.LevelResults) {
+            payload.LevelResults =  levelResults
+          } 
+    
+    // Вызываем updateUser и возвращаем результат
+            return UsersService.updateUser(payload);
     }
 
 
@@ -229,7 +236,7 @@ const UsersService = {
       payload.LevelResults
     )
     {
-      user.LevelResults = String(payload.LevelResults)
+      user.LevelResults = payload.LevelResults
     }
 
 
