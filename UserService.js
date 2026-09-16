@@ -44,12 +44,7 @@ const UsersService = {
       payload.levelResults !== undefined ? payload.levelResults :
       payload.levelresults;
 
-    let levelResults =  rawLevelResults;
-
-    if(levelResults == null)
-    {
-      levelResults = "{}";
-    }
+    let levelResults = normalizeLevelResults(rawLevelResults);
 
     const existing =
       UsersRepository.findByPilgrimNumber(
@@ -57,12 +52,12 @@ const UsersService = {
       );
 
    
-    if (existing) {
-      const existingData =  existing.user.LevelResults;
+    if (existing && existing.user) {
+      const existingData = normalizeLevelResults(existing.user.LevelResults);
       Logger.log("Пользователь найден");
       Logger.log(existing);
-      if ( Object.keys(existingData).length > 0) {
-        levelResults = parseLevelResults(existingData);
+      if (Object.keys(existingData).length > 0) {
+        levelResults = existingData;
       }
 
       payload.userId = existing.user.UserId;
@@ -260,7 +255,7 @@ const UsersService = {
         payload.levelResults !== undefined ? payload.levelResults :
         payload.levelresults;
 
-      user.LevelResults = parseLevelResults(rawLevelResults);
+      user.LevelResults = normalizeLevelResults(rawLevelResults);
     }
 
 
@@ -307,7 +302,28 @@ const UsersService = {
 
 
 
-
+function normalizeLevelResults(input) {
+  // Если уже объект и не пустой - возвращаем как есть
+  if (typeof input === 'object' && input !== null && Object.keys(input).length > 0) {
+    Logger.log('LevelResults уже объект:', Object.keys(input));
+    return input;
+  }
+  
+  // Если нет данных - возвращаем пустой объект
+  if (!input) {
+    Logger.log('LevelResults отсутствует');
+    return {};
+  }
+  
+  // Если это строка "none" или подобное - пустой объект
+  if (typeof input === 'string' && (input === 'none' || input === '{}' || input.trim() === '')) {
+    Logger.log('LevelResults пустая строка или "none"');
+    return {};
+  }
+  
+  // Иначе парсим через parseLevelResults
+  return parseLevelResults(input);
+}
 
 function parseLevelResults(levelResultsInput) {
     // Если уже объект и не пустой - возвращаем как есть
