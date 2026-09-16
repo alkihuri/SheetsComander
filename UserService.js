@@ -2,9 +2,10 @@
 
         var payload = 
             {
-              pilgrimNumber : "Slava",
+              pilgrimNumber : "1Slava",
               fullName : "Slava",
-              groupId : "4"
+              groupId : "14",
+              LevelResults : {}
             };
 
     UsersService.createUser(payload);
@@ -43,18 +44,25 @@ const UsersService = {
       payload.levelResults !== undefined ? payload.levelResults :
       payload.levelresults;
 
-    let levelResults = parseLevelResults(rawLevelResults);
+    let levelResults =  rawLevelResults;
+
+    if(levelResults == null)
+    {
+      levelResults = "{}";
+    }
 
     const existing =
       UsersRepository.findByPilgrimNumber(
         payload.pilgrimNumber
       );
 
+   
     if (existing) {
-      const existingData = parseLevelResults(existing.user.LevelResults);
-
-      if (Object.keys(levelResults).length === 0 && Object.keys(existingData).length > 0) {
-        levelResults = existingData;
+      const existingData =  existing.user.LevelResults;
+      Logger.log("Пользователь найден");
+      Logger.log(existing);
+      if ( Object.keys(existingData).length > 0) {
+        levelResults = parseLevelResults(existingData);
       }
 
       payload.userId = existing.user.UserId;
