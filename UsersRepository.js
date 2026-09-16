@@ -130,7 +130,7 @@ const UsersRepository = {
       CreatedAt: Utils.normalizeValue(row[4]),
       UpdatedAt: Utils.normalizeValue(row[5]),
       Status: row[6],
-      LevelResult : row[7]
+      LevelResults: row[7]
     };
   },
 

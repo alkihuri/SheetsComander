@@ -1,5 +1,19 @@
+ function testCreateMaga (){
+
+        var payload = 
+            {
+              pilgrimNumber : "Slava",
+              fullName : "Slava",
+              groupId : "4"
+            };
+
+    UsersService.createUser(payload);
+
+}
+
 const UsersService = {
 
+  
   createUser: function(payload) {
 
     Validation.require(
@@ -23,35 +37,30 @@ const UsersService = {
     );
 
 
-    // 2. LevelResults - парсим JSON
-    let levelResults = parseLevelResults(payload.LevelResults);
-     
+    // Normalize legacy key variants into one canonical field.
+    const rawLevelResults =
+      payload.LevelResults !== undefined ? payload.LevelResults :
+      payload.levelResults !== undefined ? payload.levelResults :
+      payload.levelresults;
 
-
-
-    /*
-     * Check duplicate pilgrim number.
-     */
+    let levelResults = parseLevelResults(rawLevelResults);
 
     const existing =
       UsersRepository.findByPilgrimNumber(
         payload.pilgrimNumber
       );
 
-
     if (existing) {
+      const existingData = parseLevelResults(existing.user.LevelResults);
 
-       // Если пользователь существует - обновляем его
-    // Добавляем userId из найденной записи
-        payload.userId = existing.user.UserId;
-    
-    // Если LevelResults передан, обновляем его
-          if (payload.LevelResults) {
-            payload.LevelResults =  levelResults
-          } 
-    
-    // Вызываем updateUser и возвращаем результат
-            return UsersService.updateUser(payload);
+      if (Object.keys(levelResults).length === 0 && Object.keys(existingData).length > 0) {
+        levelResults = existingData;
+      }
+
+      payload.userId = existing.user.UserId;
+      payload.LevelResults = levelResults;
+
+      return UsersService.updateUser(payload);
     }
 
 
@@ -233,10 +242,17 @@ const UsersService = {
     }
 
     if(
-      payload.LevelResults
+      payload.LevelResults !== undefined ||
+      payload.levelResults !== undefined ||
+      payload.levelresults !== undefined
     )
     {
-      user.LevelResults = payload.LevelResults
+      const rawLevelResults =
+        payload.LevelResults !== undefined ? payload.LevelResults :
+        payload.levelResults !== undefined ? payload.levelResults :
+        payload.levelresults;
+
+      user.LevelResults = parseLevelResults(rawLevelResults);
     }
 
 
