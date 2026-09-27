@@ -17,6 +17,15 @@ function doGet(e) {
 
     console.log("GET PARAMS:", JSON.stringify(params));
 
+
+
+    // Dashboard
+    if (params.dashboard !== undefined) {
+      return HtmlService
+        .createHtmlOutputFromFile('Index')
+        .setTitle('HajjFlow Analytics');
+    }
+    
     if (!params.action) {
       console.log("GET request without action");
 

@@ -2,13 +2,25 @@
 
         var payload = 
             {
-              pilgrimNumber : "1Slava",
-              fullName : "Slava",
-              groupId : "14",
-              LevelResults : {}
+              pilgrimNumber : "TEST1",
+              fullName : "TEST1",
+              groupId : "TEST1"
             };
 
-    UsersService.createUser(payload);
+    Logger.log(UsersService.createUser(payload));
+
+}
+
+ function testGetMaga (){
+
+        var payload = 
+            {
+              pilgrimNumber : "Kabir",
+              fullName : "Kabir",
+              groupId : "6"
+            };
+
+    Logger.log(UsersService.findUser(payload));
 
 }
 
@@ -134,6 +146,8 @@ const UsersService = {
 
     return result;
   },
+
+ 
 
 
   findUser: function(payload) {
