@@ -1397,43 +1397,10 @@ function loadData() {
 
   showLoading();
 
-
-  /*
-   * Если backend уже готов:
-   *
-   * google.script.run
-   *   .withSuccessHandler(handleData)
-   *   .withFailureHandler(handleError)
-   *   .getDashboardData();
-   *
-   *
-   * Сейчас используем mock data,
-   * чтобы UI можно было проверить сразу.
-   */
-
-
-  if (
-    typeof google !== 'undefined' &&
-    google.script &&
-    google.script.run
-  ) {
-
-    google.script.run
-      .withSuccessHandler(handleData)
-      .withFailureHandler(handleError)
-      .getDashboardData();
-
-    return;
-  }
-
-
-  setTimeout(() => {
-
-    handleData(
-      createMockData()
-    );
-
-  }, 300);
+  google.script.run
+    .withSuccessHandler(handleData)
+    .withFailureHandler(handleError)
+    .getDashboardData();
 
 }
 
@@ -1464,22 +1431,12 @@ function handleError(error) {
 
   console.error(error);
 
-
   hideLoading();
 
-
-  /*
-   * Для локальной разработки
-   * показываем mock data.
-   */
-
-  dashboardData =
-    createMockData();
-
-
-  populateGroups();
-
-  applyFilters();
+  alert(
+    'Ошибка загрузки данных: ' +
+    (error?.message || 'Неизвестная ошибка')
+  );
 
 }
 
@@ -2500,157 +2457,30 @@ function escapeHtml(value) {
 
 /*
 |--------------------------------------------------------------------------
-| MOCK DATA
+| LOADING STATE
 |--------------------------------------------------------------------------
-|
-| Можно удалить после подключения backend.
-|
 */
 
-function createMockData() {
+function showLoading() {
 
-  return {
+  const loading =
+    document.getElementById('loading');
 
-    groups: [
-      'Хызыр Темботов',
-      'Группа А',
-      'Группа Б'
-    ],
-
-
-    users: [
-
-      createMockUser(
-        'Алиев Алихан',
-        'Хызыр Темботов',
-        '1001',
-        [100, 92, 88, 95, 90, 87, 91]
-      ),
-
-
-      createMockUser(
-        'Марьяна',
-        'Хызыр Темботов',
-        '1002',
-        [100, 80, 75, 70, 85, null, null]
-      ),
-
-
-      createMockUser(
-        'Фатима Тхакахова',
-        'Хызыр Темботов',
-        '1003',
-        [null, 0, null, 70, null, null, null]
-      ),
-
-
-      createMockUser(
-        'Аннета',
-        'Хызыр Темботов',
-        '1004',
-        [null, null, null, null, null, null, null]
-      ),
-
-
-      createMockUser(
-        'Магомед Абдуллаев',
-        'Группа А',
-        '2001',
-        [100, 90, 85, 80, 78, 88, 90]
-      ),
-
-
-      createMockUser(
-        'Хадижат Алиева',
-        'Группа А',
-        '2002',
-        [100, 70, 65, null, null, null, null]
-      ),
-
-
-      createMockUser(
-        'Ахмед Магомедов',
-        'Группа Б',
-        '3001',
-        [100, 100, 95, 90, null, null, null]
-      )
-
-    ]
-
-  };
+  if (loading) {
+    loading.classList.remove('hidden');
+  }
 
 }
 
 
-function createMockUser(
-  fullName,
-  group,
-  pilgrimNumber,
-  scores
-) {
+function hideLoading() {
 
-  const levels =
-    scores.map(
-      (score, index) => {
+  const loading =
+    document.getElementById('loading');
 
-        if (score === null) {
-
-          return {
-
-            level: index,
-
-            status:
-              'NOT_STARTED',
-
-            started: false,
-
-            completed: false,
-
-            score: null,
-
-            completedAt: null
-
-          };
-
-        }
-
-
-        return {
-
-          level: index,
-
-          status:
-            'COMPLETED',
-
-          started: true,
-
-          completed: true,
-
-          score,
-
-          completedAt:
-            '2026-09-20'
-
-        };
-
-      }
-    );
-
-
-  return {
-
-    userId:
-      `mock-${pilgrimNumber}`,
-
-    pilgrimNumber,
-
-    fullName,
-
-    group,
-
-    levels
-
-  };
+  if (loading) {
+    loading.classList.add('hidden');
+  }
 
 }
 
