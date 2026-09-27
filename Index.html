@@ -1491,7 +1491,7 @@ function normalizeUser(user) {
     if (!raw) {
 
       levels.push({
-        level: i,
+        level:  LEVEL_LABELS[i],
         status: 'NOT_STARTED',
         started: false,
         completed: false,
@@ -1504,7 +1504,7 @@ function normalizeUser(user) {
 
 
     levels.push({
-      level: i,
+      level:  LEVEL_LABELS[i],
 
       status:
         raw.status ||
@@ -1895,7 +1895,7 @@ function renderLevelStats(users) {
     row.innerHTML = `
 
       <div class="level-name">
-        Level ${level}
+        ${LEVEL_LABELS[level]}
       </div>
 
       <div class="progress-track">
@@ -2310,7 +2310,7 @@ function renderLevelDetail(level) {
     <div class="level-detail">
 
       <strong>
-        Level ${level.level}
+        ${level.level}
       </strong>
 
 
@@ -2396,7 +2396,7 @@ function getLastLevelLabel(user) {
     ];
 
 
-  return `Level ${last.level}`;
+  return `${last.level}`;
 
 }
 
@@ -2483,6 +2483,16 @@ function hideLoading() {
   }
 
 }
+
+const LEVEL_LABELS = {
+0: 'Умра: База',
+1: 'Ихрам',
+  2: 'Микат',
+  3: 'Прибытие в Мекку',
+  4: 'Таваф',
+  5: 'Сай и Марва',
+  6: 'Повторная Умра'
+};
 
 
 </script>

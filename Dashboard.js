@@ -64,12 +64,10 @@ function getDashboardData() {
 }
 
 function parseDashboardUser(row) {
-
-Logger.log("row" + row.LevelResults +  "123");
+ 
   const levels = parseLevelResults2(
     row.LevelResults
-  ) || [];
- Logger.log("123:" +  levels);
+  ) || []; 
   if(levels == null)
   return;
   const completedLevels =
@@ -210,7 +208,8 @@ function parseLevelResults2(levelResultsRaw) {
     const isStarted = isCompleted || hasScore;
 
     levels.push({
-      level: i,
+      level: getLevel(levelId),
+      id : levelId,  
       status: isCompleted ? 'COMPLETED' : (isStarted ? 'STARTED' : 'NOT_STARTED'),
       started: isStarted,
       completed: isCompleted,

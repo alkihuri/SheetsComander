@@ -174,3 +174,28 @@ function DoGetProgressTest()
   
 }
 
+let _levelDict = null;
+
+function getLevelDict() {
+  if (_levelDict) return _levelDict;
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Обозначения');
+  const data = sheet.getRange('A1:B12').getValues();
+  _levelDict = {};
+  for (let i = 0; i < data.length; i++) {
+    _levelDict[data[i][0]] = data[i][1];
+  }
+  return _levelDict;
+}
+
+function getLevel(levelKey) {
+  const dict = getLevelDict();
+  return dict[levelKey] !== undefined ? dict[levelKey] : null;
+}
+
+
+function TestLevel()
+{
+  Logger.log(getLevel("level_0"));
+}
+ 
+
