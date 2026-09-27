@@ -390,8 +390,8 @@ function parseLevelResults(levelResultsInput) {
         Logger.log('Количество уровней:', Object.keys(result).length);
         return result;
     } catch (e) {
-        Logger.log('❌ Ошибка парсинга JSON:', e.message);
-        Logger.log('Строка для парсинга:', str);
+        Logger.log('❌ Ошибка парсинга JSON:' +  e.message);
+        Logger.log('Строка для парсинга:' +  str);
         
         // Шаг 5: Пробуем исправить распространенные проблемы
         try {

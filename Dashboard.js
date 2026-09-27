@@ -65,10 +65,13 @@ function getDashboardData() {
 
 function parseDashboardUser(row) {
 
-  const levels = parseLevelResults(
+Logger.log("row" + row.LevelResults +  "123");
+  const levels = parseLevelResults2(
     row.LevelResults
-  );
-
+  ) || [];
+ Logger.log("123:" +  levels);
+  if(levels == null)
+  return;
   const completedLevels =
     levels.filter(
       level => level.completed
@@ -126,78 +129,95 @@ function parseDashboardUser(row) {
 
 }
 
-function parseLevelResults(levelResultsRaw) {
+function parseLevelResults2(levelResultsRaw) {
 
-  const levels = [];
+  const NOT_STARTED = (i) => ({
+    level: i,
+    status: 'NOT_STARTED',
+    started: false,
+    completed: false,
+    score: null,
+    completedAt: null
+  });
 
-  if (!levelResultsRaw) {
-    for (let i = 0; i < 7; i++) {
-      levels.push({
-        level: i,
-        status: 'NOT_STARTED',
-        started: false,
-        completed: false,
-        score: null,
-        completedAt: null
-      });
-    }
+  const emptyLevels = () => {
+    const levels = [];
+    for (let i = 0; i < 7; i++) levels.push(NOT_STARTED(i));
     return levels;
+  };
+
+  if (!levelResultsRaw || levelResultsRaw === '{}' || levelResultsRaw === '') {
+    return emptyLevels();
   }
 
-  let parsed = [];
+  const levelMap = {};
 
   if (typeof levelResultsRaw === 'string') {
     try {
-      parsed = JSON.parse(levelResultsRaw);
+      let cleaned = levelResultsRaw.trim();
+
+      // Remove outer quotes if present
+      if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+        cleaned = cleaned.slice(1, -1);
+      }
+
+      // Extract level entries like "level_0={...}"
+      const levelMatches = cleaned.match(/level_\d+={[^}]+}/g) || [];
+
+      levelMatches.forEach(match => {
+        const levelIdEnd = match.indexOf('=');
+        const levelId = match.substring(0, levelIdEnd).trim();
+        const content = match.substring(levelIdEnd + 2, match.length - 1); // strip = and { }
+
+        const params = {};
+
+        // Parse key=value pairs inside the braces (split only on first '=')
+        const paramMatches = content.match(/(\w+)=([^,}]+)/g) || [];
+        paramMatches.forEach(param => {
+          const eq = param.indexOf('=');
+          const key = param.slice(0, eq).trim();
+          const value = param.slice(eq + 1).trim();
+          params[key] = value;
+        });
+
+        levelMap[levelId] = params;
+      });
     } catch (e) {
-      parsed = [];
+      Logger.log('Error parsing level results: ' + e.message);
+      return emptyLevels();
     }
-  } else if (Array.isArray(levelResultsRaw)) {
-    parsed = levelResultsRaw;
   }
 
+  // Build levels array with all 7 levels
+  const levels = [];
   for (let i = 0; i < 7; i++) {
-
-    const raw = parsed[i];
+    const levelId = 'level_' + i;
+    const raw = levelMap[levelId];
 
     if (!raw) {
-      levels.push({
-        level: i,
-        status: 'NOT_STARTED',
-        started: false,
-        completed: false,
-        score: null,
-        completedAt: null
-      });
+      levels.push(NOT_STARTED(i));
       continue;
     }
 
-    const score =
-      typeof raw.score === 'number'
-        ? raw.score
-        : raw.score !== null && raw.score !== undefined
-          ? Number(raw.score)
-          : null;
+    const hasScore = raw.ScorePercent !== undefined && raw.ScorePercent !== '';
+    const scorePercent = hasScore ? parseFloat(raw.ScorePercent) : null;
+    const hasCompletedAt = !!raw.CompletedAt;
+
+    // Completed if there is a CompletedAt timestamp OR a positive score
+    const isCompleted = hasCompletedAt || (scorePercent !== null && scorePercent > 0);
+
+    // Started if there is any meaningful data beyond just LevelId
+    const isStarted = isCompleted || hasScore;
 
     levels.push({
       level: i,
-      status:
-        raw.status ||
-        (
-          raw.completed
-            ? 'COMPLETED'
-            : raw.started
-              ? 'IN_PROGRESS'
-              : 'NOT_STARTED'
-        ),
-      started: Boolean(raw.started),
-      completed: Boolean(raw.completed),
-      score: isFinite(score) ? score : null,
-      completedAt: raw.completedAt || null
+      status: isCompleted ? 'COMPLETED' : (isStarted ? 'STARTED' : 'NOT_STARTED'),
+      started: isStarted,
+      completed: isCompleted,
+      score: scorePercent,
+      completedAt: raw.CompletedAt || null
     });
-
   }
 
   return levels;
-
 }
